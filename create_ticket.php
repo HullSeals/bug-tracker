@@ -22,6 +22,7 @@ if (isset($_GET['err'])) {
 	    <article id="intro3">
         <h3>Welcome to the Hull Seals Support System</h3>
         <p>Please provide a detailed report so we can diagnose issues quickly.</p>
+        <p><a href="." class="btn btn-sm btn-danger" style="float: right;">Go Back</a></p><br>
         <?php include $abs_us_root.$us_url_root."usersc/plugins/tickets/create_ticket.php"; ?>
       </div>
       <br>
