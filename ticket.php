@@ -75,6 +75,54 @@ if(!empty($_POST)){
           email($fetch->email,"One of your tickets has a new comment",$comment);
         }
       }
+
+      $ticketsub = $ticket->subject;
+      $ticketlink='https://hullseals.space/support/ticket.php?id='.$id;
+      //Discord Webhook
+    $timestamp = date("c", strtotime("now"));
+      $json_data = json_encode([
+          "content" => "Ticket has New Comment",
+          "username" => "HalpyBOT",
+          "avatar_url" => "https://hullseals.space/images/emblem_mid.png",
+          "tts" => false,
+          "embeds" => [
+              [
+                  "title" => "Ticket has New Comment",
+                  "type" => "rich",
+                  "timestamp" => $timestamp,
+                  "color" => hexdec( "F5921F" ),
+                  "footer" => [
+                      "text" => "Hull Seals Ticket Notification System",
+                      "icon_url" => "https://hullseals.space/images/emblem_mid.png"
+                  ],
+                  "fields" => [
+                      [
+                          "name" => "Ticket",
+                          "value" => $ticketsub,
+                          "inline" => true
+                      ],
+                      [
+                          "name" => "Link",
+                          "value" => $ticketlink,
+                          "inline" => true
+                      ]
+
+                  ]
+              ]
+          ]
+
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+$ch = curl_init( 'https://discord.com/api/webhooks/873771410609279036/O7cE2UVM_4y5-UdLuFeHTFoki2p_YEiXgYjC5ttmPZOKrMZCEOZsmXLY6nCtju3VlVua' );
+curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+curl_setopt( $ch, CURLOPT_POST, 1);
+curl_setopt( $ch, CURLOPT_POSTFIELDS, $json_data);
+curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt( $ch, CURLOPT_HEADER, 0);
+curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+$response = curl_exec( $ch );
+curl_close( $ch );
+
+      $db->update("plg_tickets",$id,["last_updated"=>date("Y-m-d H:i:s")]);
       Redirect::to("ticket.php?id=$id&err=Note added");
     }
   }
@@ -90,6 +138,7 @@ if(!empty($_POST)){
     Redirect::to("ticket.php?id=$id&err=Ticket Updated");
   }
 }
+
 ?>
 <link href="<?=$us_url_root?>usersc/plugins/tickets/assets/style.css" rel="stylesheet">
 <div class="row" style="color:black">
@@ -207,7 +256,6 @@ if(!empty($_POST)){
               <p class="card-text" style="white-space: pre-line;"><?=$ticket->$col?></p>
 
             <?php } ?>
-
           </div>
         </div>
 
@@ -238,7 +286,7 @@ if(!empty($_POST)){
                         <?php echo time2str($c->ts);?>
                       </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="white-space: pre-line;">
                       <b><?=$c->note?></b>
 
                     </div>

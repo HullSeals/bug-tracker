@@ -29,7 +29,11 @@ if(!hasPerm([$ticSettings->perm_to_assign],$user->data()->id)){
 
 if($closed != "true"){
   $cl = " AND closed = 0";
-}else{
+}
+elseif ($closed = "true") {
+  $cl = "";
+}
+else{
   $cl = "";
 }
 
@@ -109,7 +113,8 @@ if(!empty($_POST)){
     <table class="table table-hover table-dark table-bordered table-striped" style="color:white">
       <thead>
         <tr>
-          <th>User</th>
+	  <th>ID</th>
+	  <th>User</th>
           <th>Subject</th>
           <th>Status</th>
           <th>
@@ -125,7 +130,8 @@ if(!empty($_POST)){
       </thead>
       <tbody>
         <?php foreach($tickets as $t){ ?>
-          <tr>
+	  <tr>
+	    <td><?=$t->id;?></td>
             <td><?php echouser($t->user);?></td>
             <td><?=substr($t->subject,0,100);?></td>
             <td><?=$t->status;?></td>
@@ -144,7 +150,7 @@ if(!empty($_POST)){
       </tbody>
     </table>
   </div>
-<br><a class="btn btn-primary btn-lg" href="https://hullseals.space/usersc/plugins/tickets/create_ticket.php" role="button">Submit a Support Ticket</a><br>
+<br><a class="btn btn-primary btn-lg" href="https://hullseals.space/support/create_ticket.php" role="button">Submit a Support Ticket</a><br>
 </div>
 </article>
       <div class="clearfix"></div>
