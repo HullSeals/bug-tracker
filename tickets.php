@@ -6,13 +6,13 @@ if (!securePage($_SERVER['PHP_SELF'])){die();}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <?php include '../assets/includes/headerCenter.php'; ?>
+  <?php require_once $abs_us_root.$us_url_root.'usersc/templates/seals/temp/headerCenter.php'; ?>
     <meta content="Support Tickets" name="description">
     <title>Support Tickets | The Hull Seals</title>
 </head>
 <body>
     <div id="home">
-      <?php include '../assets/includes/menuCode.php';?>
+      <?php require_once $abs_us_root.$us_url_root.'usersc/templates/seals/temp/menuCode.php';?>
       <section class="introduction container">
     <article id="intro3">
 <p><a href="." class="btn btn-sm btn-danger" style="float: right;">Go Back</a></p><br>
@@ -152,13 +152,7 @@ if(!empty($_POST)){
   </div>
 <br><a class="btn btn-primary btn-lg" href="https://hullseals.space/support/create_ticket.php" role="button">Submit a Support Ticket</a><br>
 </div>
-</article>
-      <div class="clearfix"></div>
-  </section>
-</div>
-   <?php include '../assets/includes/footer.php'; ?>
-</body>
-</html>
+<?php require_once $abs_us_root . $us_url_root . 'users/includes/html_footer.php'; ?>
 
 <script type="text/javascript" src="<?=$us_url_root?>users/js/pagination/datatables.min.js"></script>
 <script>
