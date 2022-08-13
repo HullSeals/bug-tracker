@@ -1,22 +1,12 @@
 <?php
 require_once "../users/init.php";
+require_once $abs_us_root.$us_url_root.'users/includes/template/prep.php';
 if(!pluginActive("tickets",true)){ die("Tickets plugin not active");}
-if (!securePage($_SERVER['PHP_SELF'])){die();}
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <?php require_once $abs_us_root.$us_url_root.'usersc/templates/seals/temp/headerCenter.php'; ?>
-    <meta content="Support Tickets" name="description">
-    <title>Support Tickets | The Hull Seals</title>
-</head>
-<body>
-    <div id="home">
-      <?php require_once $abs_us_root.$us_url_root.'usersc/templates/seals/temp/menuCode.php';?>
-      <section class="introduction container">
-    <article id="intro3">
-<p><a href="." class="btn btn-sm btn-danger" style="float: right;">Go Back</a></p><br>
-<?php
+if(!isset($user) || !$user->isLoggedIn()){ ?>
+  <a href="<?=$us_url_root?>users/login.php">Sorry, you must login.</a>
+  <?php
+  die;
+}
 $ticSettings = $db->query("SELECT * FROM plg_tickets_settings")->first();
 $closed = Input::get('closed');
 $filter = Input::get('filter');
@@ -29,11 +19,7 @@ if(!hasPerm([$ticSettings->perm_to_assign],$user->data()->id)){
 
 if($closed != "true"){
   $cl = " AND closed = 0";
-}
-elseif ($closed = "true") {
-  $cl = "";
-}
-else{
+}else{
   $cl = "";
 }
 
@@ -100,6 +86,7 @@ if(!empty($_POST)){
 ?>
 <div class="row">
   <div class="col-12">
+    <p><a href="./create_ticket.php" class="btn btn-sm btn-primary" style="float:left;">Submit a Ticket</a> <a href="." class="btn btn-sm btn-danger" style="float: right;">Go Back</a></p><br>
     <h2 class="text-center">Tickets (<?=$ticketsC?>)</h2>
     <p class="text-center">
       <?php
@@ -110,11 +97,11 @@ if(!empty($_POST)){
         <a class="btn btn-sm btn-info" href="<?=$cp?>">Hide Closed Tickets</a>
       <?php } ?>
     </p>
-    <table class="table table-hover table-dark table-bordered table-striped" style="color:white">
+    <table border="5" cellspacing="2" cellpadding="2" class="table table-dark table-striped table-bordered table-hover paginate">
       <thead>
         <tr>
-	  <th>ID</th>
-	  <th>User</th>
+          <th>ID</th>
+          <th>User</th>
           <th>Subject</th>
           <th>Status</th>
           <th>
@@ -130,8 +117,8 @@ if(!empty($_POST)){
       </thead>
       <tbody>
         <?php foreach($tickets as $t){ ?>
-	  <tr>
-	    <td><?=$t->id;?></td>
+          <tr>
+            <td><?=$t->id;?></td>
             <td><?php echouser($t->user);?></td>
             <td><?=substr($t->subject,0,100);?></td>
             <td><?=$t->status;?></td>
@@ -150,13 +137,12 @@ if(!empty($_POST)){
       </tbody>
     </table>
   </div>
-<br><a class="btn btn-primary btn-lg" href="https://hullseals.space/support/create_ticket.php" role="button">Submit a Support Ticket</a><br>
+  <br><a class="btn btn-primary btn-lg" href="https://hullseals.space/support/create_ticket.php" role="button">Submit a Support Ticket</a><br>
 </div>
-<?php require_once $abs_us_root . $us_url_root . 'users/includes/html_footer.php'; ?>
-
 <script type="text/javascript" src="<?=$us_url_root?>users/js/pagination/datatables.min.js"></script>
 <script>
 $(document).ready(function () {
   $('.paginate').DataTable({"pageLength": 25,"aLengthMenu": [[25, 50, 100, -1], [25, 50, 100, 250, 500]], "aaSorting": []});
 });
 </script>
+<?php require_once $abs_us_root . $us_url_root . 'users/includes/html_footer.php'; ?>

@@ -1,24 +1,9 @@
 <?php
 require_once "../users/init.php";
+require_once $abs_us_root.$us_url_root.'users/includes/template/prep.php';
 if(!pluginActive("tickets",true)){ die("Tickets plugin not active");}
 $id = Input::get('id');
-if (!securePage($_SERVER['PHP_SELF'])){die();}
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <?php require_once $abs_us_root.$us_url_root.'usersc/templates/seals/temp/headerCenter.php'; ?>
-    <meta content="Support Tickets" name="description">
-    <title>Support Tickets | The Hull Seals</title>
-</head>
-<body>
-    <div id="home">
-      <?php require_once $abs_us_root.$us_url_root.'usersc/templates/seals/temp/menuCode.php'; ?>
-      <section class="introduction container">
-    <article id="intro3">
-<p><a href="tickets.php" class="btn btn-sm btn-danger" style="float: right;">Go Back</a></p><br>
 
-<?php
 $ticketQ = $db->query("SELECT * FROM plg_tickets WHERE id = ?",[$id]);
 $ticketC = $ticketQ->count();
 if($ticketC < 1){
@@ -30,6 +15,11 @@ if($ticketC < 1){
 $stats = $db->query("SELECT * FROM plg_tickets_status")->results();
 $cats = $db->query("SELECT * FROM plg_tickets_cats")->results();
 
+if(!isset($user) || !$user->isLoggedIn()){ ?>
+  <a href="<?=$us_url_root?>users/login.php">Sorry, you must login.</a>
+  <?php
+  die;
+}
 $ticSettings = $db->query("SELECT * FROM plg_tickets_settings")->first();
 $notes = $db->query("SELECT * FROM plg_tickets_notes WHERE ticket = ? ORDER BY id DESC",[$id])->results();
 
@@ -76,52 +66,7 @@ if(!empty($_POST)){
         }
       }
 
-      $ticketsub = $ticket->subject;
-      $ticketlink='https://hullseals.space/support/ticket.php?id='.$id;
-      //Discord Webhook
-    $timestamp = date("c", strtotime("now"));
-      $json_data = json_encode([
-          "content" => "Ticket has New Comment",
-          "username" => "HalpyBOT",
-          "avatar_url" => "https://hullseals.space/images/emblem_mid.png",
-          "tts" => false,
-          "embeds" => [
-              [
-                  "title" => "Ticket has New Comment",
-                  "type" => "rich",
-                  "timestamp" => $timestamp,
-                  "color" => hexdec( "F5921F" ),
-                  "footer" => [
-                      "text" => "Hull Seals Ticket Notification System",
-                      "icon_url" => "https://hullseals.space/images/emblem_mid.png"
-                  ],
-                  "fields" => [
-                      [
-                          "name" => "Ticket",
-                          "value" => $ticketsub,
-                          "inline" => true
-                      ],
-                      [
-                          "name" => "Link",
-                          "value" => $ticketlink,
-                          "inline" => true
-                      ]
-
-                  ]
-              ]
-          ]
-
-      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-$ch = curl_init( 'https://discord.com/api/webhooks/873771410609279036/O7cE2UVM_4y5-UdLuFeHTFoki2p_YEiXgYjC5ttmPZOKrMZCEOZsmXLY6nCtju3VlVua' );
-curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-curl_setopt( $ch, CURLOPT_POST, 1);
-curl_setopt( $ch, CURLOPT_POSTFIELDS, $json_data);
-curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-curl_setopt( $ch, CURLOPT_HEADER, 0);
-curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-$response = curl_exec( $ch );
-curl_close( $ch );
-
+      require $abs_us_root.$us_url_root."usersc/plugins/tickets/assets/shout.php";
       $db->update("plg_tickets",$id,["last_updated"=>date("Y-m-d H:i:s")]);
       Redirect::to("ticket.php?id=$id&err=Note added");
     }
@@ -286,7 +231,7 @@ curl_close( $ch );
                         <?php echo time2str($c->ts);?>
                       </div>
                     </div>
-                    <div class="card-body" style="white-space: pre-line;">
+                    <div class="card-body">
                       <b><?=$c->note?></b>
 
                     </div>
